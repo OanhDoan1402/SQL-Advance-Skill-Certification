@@ -1,1 +1,0 @@
-# SQL-Advance-Skill-Certification
