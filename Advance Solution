@@ -23,3 +23,35 @@ FROM (
 WHERE ranking <= 3
 GROUP BY event_id
 ORDER BY event_id ASC
+--=============================================================
+CRYPTO MARKET ALGORITHM REPORT
+
+select Q1.algorithm, Q1Volume, Q2Volume, Q3Volume, Q4Volume
+from ( select c.algorithm,
+sum(volume) as Q1Volume
+from coins c
+join transactions t on c.code = t.coin_code
+where year(dt) = 2020 and quarter(dt) = 1
+group by c.algorithm ) Q1
+inner JOIN
+( select c.algorithm,
+sum(volume) as Q2Volume
+from coins c
+join transactions t on c.code = t.coin_code
+where year(dt) = 2020 and quarter(dt) = 2
+group by c.algorithm ) Q2 on Q1.algorithm = Q2.algorithm
+inner JOIN
+( select c.algorithm,
+sum(volume) as Q3Volume
+from coins c
+join transactions t on c.code = t.coin_code
+where year(dt) = 2020 and quarter(dt) = 3
+group by c.algorithm ) Q3 on Q1.algorithm = Q3.algorithm
+inner JOIN
+( select c.algorithm,
+sum(volume) as Q4Volume
+from coins c
+join transactions t on c.code = t.coin_code
+where year(dt) = 2020 and quarter(dt) = 4
+group by c.algorithm ) Q4 on Q1.algorithm = Q4.algorithm
+ORDER BY Q1.algorithm ASC
