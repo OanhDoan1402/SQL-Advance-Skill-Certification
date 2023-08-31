@@ -1,57 +1,40 @@
-**TOPIC: WINNER CHARTS**
 
-There were a number of contests where participants each made multiple attempts.  The attempt with the highest score is the only one considered.  
-Write a query to list the contestants ranked in the top 3 for each contest.  If multiple contestants have the same score in a contest, they are at the same rank.
-Report event_id, rank 1 name(s), rank 2 name(s), rank 3 name(s).  Order the contests by event_id. Names that share a rank should be ordered alphabetically and 
-separated by a comma.
-Order the report by event_id.
+-- **TOPIC: WINNER CHARTS**
 
-SELECT 
-  event_id, 
-  GROUP_CONCAT(IF(ranking = 1, participant_name, NULL) ORDER BY participant_name ASC SEPARATOR ',') AS first,
-  GROUP_CONCAT(IF(ranking = 2, participant_name, NULL) ORDER BY participant_name ASC SEPARATOR ',') AS second,
-  GROUP_CONCAT(IF(ranking = 3, participant_name, NULL) ORDER BY participant_name ASC SEPARATOR ',') AS third
-FROM (
-        SELECT 
-          event_id, 
-          participant_name, 
-          MAX(score) AS best_score,
-          DENSE_RANK() OVER (PARTITION BY event_id ORDER BY MAX(score) DESC) AS ranking    
-        FROM scoretable
-        GROUP BY event_id, participant_name
-      ) AS rankings
-WHERE ranking <= 3
-GROUP BY event_id
-ORDER BY event_id ASC
---=============================================================
-CRYPTO MARKET ALGORITHM REPORT
+-- There were a number of contests where participants each made multiple attempts.  The attempt with the highest score is the only one considered.  
+-- Write a query to list the contestants ranked in the top 3 for each contest.  If multiple contestants have the same score in a contest, they are at the same rank.
+-- Report event_id, rank 1 name(s), rank 2 name(s), rank 3 name(s).  Order the contests by event_id. Names that share a rank should be ordered alphabetically and 
+-- separated by a comma.
+-- Order the report by event_id.
+
+----------------------- CRYPTO MARKET ALGORITHM REPORT -----------------------
 
 select Q1.algorithm, Q1Volume, Q2Volume, Q3Volume, Q4Volume
-from ( select c.algorithm,
-sum(volume) as Q1Volume
-from coins c
-join transactions t on c.code = t.coin_code
-where year(dt) = 2020 and quarter(dt) = 1
-group by c.algorithm ) Q1
+from (  select c.algorithm,
+        sum(volume) as Q1Volume
+        from coins c
+        join transactions t on c.code = t.coin_code
+        where year(dt) = 2020 and quarter(dt) = 1
+        group by c.algorithm ) Q1
 inner JOIN
-( select c.algorithm,
-sum(volume) as Q2Volume
-from coins c
-join transactions t on c.code = t.coin_code
-where year(dt) = 2020 and quarter(dt) = 2
-group by c.algorithm ) Q2 on Q1.algorithm = Q2.algorithm
+        ( select c.algorithm,
+        sum(volume) as Q2Volume
+        from coins c
+        join transactions t on c.code = t.coin_code
+        where year(dt) = 2020 and quarter(dt) = 2
+        group by c.algorithm ) Q2 on Q1.algorithm = Q2.algorithm
 inner JOIN
-( select c.algorithm,
-sum(volume) as Q3Volume
-from coins c
-join transactions t on c.code = t.coin_code
-where year(dt) = 2020 and quarter(dt) = 3
-group by c.algorithm ) Q3 on Q1.algorithm = Q3.algorithm
+        ( select c.algorithm,
+        sum(volume) as Q3Volume
+        from coins c
+        join transactions t on c.code = t.coin_code
+        where year(dt) = 2020 and quarter(dt) = 3
+        group by c.algorithm ) Q3 on Q1.algorithm = Q3.algorithm
 inner JOIN
-( select c.algorithm,
-sum(volume) as Q4Volume
-from coins c
-join transactions t on c.code = t.coin_code
-where year(dt) = 2020 and quarter(dt) = 4
-group by c.algorithm ) Q4 on Q1.algorithm = Q4.algorithm
+        ( select c.algorithm,
+        sum(volume) as Q4Volume
+        from coins c
+        join transactions t on c.code = t.coin_code
+        where year(dt) = 2020 and quarter(dt) = 4
+        group by c.algorithm ) Q4 on Q1.algorithm = Q4.algorithm
 ORDER BY Q1.algorithm ASC
